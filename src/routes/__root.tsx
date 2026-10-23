@@ -120,6 +120,57 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    const removeLovableElements = () => {
+      const selectors = [
+        "#lovable-badge",
+        "#lovable-badge-root",
+        '[id*="lovable"]',
+        '[class*="lovable"]',
+        "[data-lovable]",
+        "[data-lovable-badge]",
+        'aside:has(a[href*="lovable.dev"])',
+        'div:has(> a[href*="lovable.dev"])',
+        'a[href*="lovable.dev"]',
+        'a[href*="gptengineer.app"]',
+        'iframe[src*="lovable"]',
+        "#gptengineer-badge",
+        '[class*="gptengineer"]',
+      ];
+      selectors.forEach((selector) => {
+        try {
+          document.querySelectorAll(selector).forEach((el) => {
+            el.remove();
+          });
+        } catch {
+          // Ignore invalid selector fallback
+        }
+      });
+
+      document.querySelectorAll("aside, div, a").forEach((el) => {
+        const text = el.textContent?.trim();
+        if (text === "Made with Lovable" || text === "Edit with Lovable") {
+          el.remove();
+        }
+      });
+    };
+
+    removeLovableElements();
+
+    const observer = new MutationObserver(() => {
+      removeLovableElements();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

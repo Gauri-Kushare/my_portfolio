@@ -141,3 +141,32 @@ body::after {
     display: none;
   }
 }
+
+/* Suppress Lovable badge and branding elements */
+#lovable-badge,
+#lovable-badge-root,
+[id*="lovable"],
+[class*="lovable"],
+[data-lovable],
+[data-lovable-badge],
+aside:has(a[href*="lovable.dev"]),
+div:has(> a[href*="lovable.dev"]),
+a[href*="lovable.dev"],
+a[href*="gptengineer.app"],
+iframe[src*="lovable"],
+#gptengineer-badge,
+[class*="gptengineer"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0) !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  z-index: -9999 !important;
+}
