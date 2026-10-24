@@ -18,6 +18,7 @@ dist-ssr
 *.local
 *.zip
 components.zip
+.lovable
 
 # Wrangler / Cloudflare
 .wrangler/
