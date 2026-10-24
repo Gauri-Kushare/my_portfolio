@@ -62,7 +62,7 @@ export const profile = {
   ],
   email: "gauri.pro24@gmail.com",
   whatsapp: "https://wa.me/917558468233",
-  instagram: "https://instagram.com/yourname",
+  instagram: "https://www.instagram.com/_gauri_k24/",
 };
 
 export const reels = [
