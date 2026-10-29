@@ -128,11 +128,11 @@ export function Cursor() {
 
 export function SectionLabel({ n, children }: { n: string; children: ReactNode }) {
   return (
-    <div className="mb-6 flex items-center gap-3 font-display text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">
-      <span className="flex h-6 w-6 items-center justify-center rounded-md border border-violet-500/30 bg-violet-950/40 text-[11px] text-violet-300 shadow-[0_0_12px_rgba(139,92,246,0.2)]">
+    <div className="mb-5 flex flex-wrap items-center gap-2.5 font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:mb-6 sm:gap-3 sm:text-xs sm:tracking-[0.28em]">
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-violet-500/30 bg-violet-950/40 text-[11px] text-violet-300 shadow-[0_0_12px_rgba(139,92,246,0.2)]">
         {n}
       </span>
-      <span className="h-px w-10 bg-gradient-to-r from-violet-500/40 to-transparent" />
+      <span className="h-px w-6 shrink-0 bg-gradient-to-r from-violet-500/40 to-transparent sm:w-10" />
       <span className="text-slate-300">{children}</span>
     </div>
   );
@@ -164,13 +164,16 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/85 p-4 backdrop-blur-2xl animate-in fade-in duration-300"
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/85 p-3 backdrop-blur-2xl animate-in fade-in duration-300 sm:p-6"
       onClick={onClose}
     >
       <button
+        type="button"
         aria-label="Close modal"
         onClick={onClose}
-        className="group absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-all hover:scale-105 hover:border-violet-500 hover:bg-violet-600 hover:text-white"
+        className="group fixed right-3 top-3 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-slate-950/80 text-slate-200 shadow-lg backdrop-blur-md transition-all hover:scale-105 hover:border-violet-500 hover:bg-violet-600 hover:text-white sm:right-6 sm:top-6"
       >
         <svg
           className="h-5 w-5 transition-transform group-hover:rotate-90"
@@ -188,7 +191,7 @@ export function Modal({
       </button>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-slate-950/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]"
+        className="max-h-[88dvh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-slate-950/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]"
       >
         {children}
       </div>
@@ -208,7 +211,13 @@ export function TiltCard({
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
-    if (!card || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      !card ||
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -222,6 +231,7 @@ export function TiltCard({
   };
 
   const handleMouseLeave = () => {
+    if (!transform) return;
     setTransform("perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)");
   };
 
@@ -230,11 +240,15 @@ export function TiltCard({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{
-        transform,
-        transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-        transformStyle: "preserve-3d",
-      }}
+      style={
+        transform
+          ? {
+              transform,
+              transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+              transformStyle: "preserve-3d",
+            }
+          : undefined
+      }
       className={className}
     >
       {children}

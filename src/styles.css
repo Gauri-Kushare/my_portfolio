@@ -62,14 +62,31 @@
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
+    min-width: 320px;
     position: relative;
+  }
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid #a855f7;
+    outline-offset: 2px;
   }
   h1,
   h2,
@@ -155,16 +172,13 @@ body::after {
 
 @utility reveal {
   opacity: 0;
-  transform: translateY(32px);
-  filter: blur(4px);
+  transform: translateY(24px);
   transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   &.is-visible {
     opacity: 1;
     transform: none;
-    filter: blur(0);
   }
 }
 
@@ -190,12 +204,14 @@ body::after {
     transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.45s ease;
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow:
-      0 24px 50px -15px rgba(0, 0, 0, 0.8),
-      0 0 40px -10px rgba(139, 92, 246, 0.25);
-    border-color: rgba(139, 92, 246, 0.4);
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow:
+        0 24px 50px -15px rgba(0, 0, 0, 0.8),
+        0 0 40px -10px rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
   }
 }
 

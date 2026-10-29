@@ -25,26 +25,35 @@ export function Hero3D() {
     let isVisible = true;
     let animationFrameId: number;
 
+    const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+    const isCompactDevice = container.clientWidth < 768 || !isFinePointer;
+
     // Scene, Camera, Renderer
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      container.clientWidth / container.clientHeight,
-      0.1,
-      100,
-    );
-    camera.position.z = 6.2;
+    const getCameraZ = (width: number, height: number) => {
+      const aspect = width / Math.max(height, 1);
+      return aspect < 1 ? Math.min(7.8, Math.max(6.2, 5.6 / Math.max(aspect, 0.68))) : 6.2;
+    };
+
+    const initialW = Math.max(container.clientWidth, 1);
+    const initialH = Math.max(container.clientHeight, 1);
+
+    const camera = new THREE.PerspectiveCamera(45, initialW / initialH, 0.1, 100);
+    camera.position.z = getCameraZ(initialW, initialH);
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isCompactDevice,
       alpha: true,
-      powerPreference: "high-performance",
+      powerPreference: isCompactDevice ? "default" : "high-performance",
     });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(initialW, initialH);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isCompactDevice ? 1.5 : 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
     container.appendChild(renderer.domElement);
 
     // 1. Centerpiece Sculpture: Chrome & Glass Complex Geometry
@@ -78,8 +87,11 @@ export function Hero3D() {
     const wireMesh = new THREE.Mesh(wireGeo, wireMat);
     coreGroup.add(wireMesh);
 
-    // Orbital kinetic chrome rings (Gyroscopic aesthetic)
-    const ringGeo1 = new THREE.TorusGeometry(2.1, 0.024, 16, 100);
+    // Orbital kinetic chrome rings (Gyroscopic aesthetic, scaled segments for mobile)
+    const radialSegs = isCompactDevice ? 12 : 16;
+    const tubularSegs = isCompactDevice ? 64 : 100;
+
+    const ringGeo1 = new THREE.TorusGeometry(2.1, 0.024, radialSegs, tubularSegs);
     const ringMat1 = new THREE.MeshStandardMaterial({
       color: 0xe2e8f0,
       metalness: 0.95,
@@ -92,7 +104,7 @@ export function Hero3D() {
     ring1.rotation.y = Math.PI / 6;
     coreGroup.add(ring1);
 
-    const ringGeo2 = new THREE.TorusGeometry(2.35, 0.018, 16, 100);
+    const ringGeo2 = new THREE.TorusGeometry(2.35, 0.018, radialSegs, tubularSegs);
     const ringMat2 = new THREE.MeshStandardMaterial({
       color: 0xa855f7,
       metalness: 0.9,
@@ -105,8 +117,8 @@ export function Hero3D() {
     ring2.rotation.y = Math.PI / 3;
     coreGroup.add(ring2);
 
-    // 2. Luminous Stardust Floating Particles
-    const particlesCount = 180;
+    // 2. Luminous Stardust Floating Particles (reduced count on mobile for efficiency)
+    const particlesCount = isCompactDevice ? 80 : 180;
     const positions = new Float32Array(particlesCount * 3);
     const colors = new Float32Array(particlesCount * 3);
 
@@ -174,6 +186,7 @@ export function Hero3D() {
 
     const onPointerMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
@@ -184,9 +197,11 @@ export function Hero3D() {
       targetLightY = 2.5 + y * 2.5;
     };
 
-    window.addEventListener("mousemove", onPointerMove, { passive: true });
+    if (isFinePointer) {
+      window.addEventListener("mousemove", onPointerMove, { passive: true });
+    }
 
-    // Touch support for drag-tilting
+    // Touch support for gentle drag-tilting on touch devices
     let touchStartX = 0;
     let touchStartY = 0;
     const onTouchStart = (e: TouchEvent) => {
@@ -199,25 +214,31 @@ export function Hero3D() {
     const onTouchMove = (e: TouchEvent) => {
       const touch = e.touches[0];
       if (touch) {
-        const dx = (touch.clientX - touchStartX) / window.innerWidth;
-        const dy = (touch.clientY - touchStartY) / window.innerHeight;
-        targetRotationY += dx * 0.05;
-        targetRotationX += dy * 0.05;
+        const dx = (touch.clientX - touchStartX) / Math.max(window.innerWidth, 1);
+        const dy = (touch.clientY - touchStartY) / Math.max(window.innerHeight, 1);
+        targetRotationY = Math.max(-0.6, Math.min(0.6, targetRotationY + dx * 0.04));
+        targetRotationX = Math.max(-0.45, Math.min(0.45, targetRotationX + dy * 0.04));
       }
     };
     container.addEventListener("touchstart", onTouchStart, { passive: true });
     container.addEventListener("touchmove", onTouchMove, { passive: true });
 
-    // Resize Observer
+    // Resize handling (window + container ResizeObserver)
     const handleResize = () => {
       if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
+      const w = Math.max(container.clientWidth, 1);
+      const h = Math.max(container.clientHeight, 1);
       camera.aspect = w / h;
+      camera.position.z = getCameraZ(w, h);
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, w < 768 ? 1.5 : 2));
     };
     window.addEventListener("resize", handleResize);
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => handleResize()) : null;
+    resizeObserver?.observe(container);
 
     // Intersection Observer to stop render loop when hero is scrolled past
     const io = new IntersectionObserver(
@@ -274,7 +295,10 @@ export function Hero3D() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       io.disconnect();
-      window.removeEventListener("mousemove", onPointerMove);
+      resizeObserver?.disconnect();
+      if (isFinePointer) {
+        window.removeEventListener("mousemove", onPointerMove);
+      }
       window.removeEventListener("resize", handleResize);
       container.removeEventListener("touchstart", onTouchStart);
       container.removeEventListener("touchmove", onTouchMove);
@@ -300,18 +324,18 @@ export function Hero3D() {
   return (
     <div
       ref={containerRef}
-      className="relative flex h-[380px] w-full items-center justify-center sm:h-[460px] md:h-[560px] lg:h-[620px]"
+      className="relative mx-auto flex h-[270px] w-full max-w-[340px] items-center justify-center min-[400px]:h-[320px] min-[400px]:max-w-[400px] sm:h-[400px] sm:max-w-[480px] md:h-[460px] md:max-w-[540px] lg:h-[540px] lg:max-w-none xl:h-[600px]"
       aria-label="Interactive 3D Dimensional Centerpiece"
     >
       {/* Background radial glow */}
-      <div className="pointer-events-none absolute h-[280px] w-[280px] rounded-full bg-violet-600/20 blur-[90px] md:h-[420px] md:w-[420px]" />
-      <div className="pointer-events-none absolute -bottom-6 h-[180px] w-[180px] rounded-full bg-sky-500/15 blur-[80px]" />
+      <div className="pointer-events-none absolute h-[200px] w-[200px] rounded-full bg-violet-600/20 blur-[70px] sm:h-[280px] sm:w-[280px] sm:blur-[90px] md:h-[400px] md:w-[400px]" />
+      <div className="pointer-events-none absolute -bottom-4 h-[140px] w-[140px] rounded-full bg-sky-500/15 blur-[60px] sm:-bottom-6 sm:h-[180px] sm:w-[180px] sm:blur-[80px]" />
 
       {!webglSupported && (
-        <div className="flex flex-col items-center justify-center p-8 text-center">
-          <div className="animate-float relative flex h-48 w-48 items-center justify-center rounded-full border border-violet-500/30 bg-gradient-to-tr from-violet-950/60 via-slate-900/40 to-sky-950/60 shadow-[0_0_80px_rgba(139,92,246,0.3)] backdrop-blur-xl">
-            <div className="h-32 w-32 rounded-full border border-sky-400/30 bg-gradient-to-br from-violet-500/20 to-transparent blur-sm" />
-            <span className="font-display absolute text-2xl font-bold tracking-widest text-white/90">
+        <div className="flex flex-col items-center justify-center p-6 text-center sm:p-8">
+          <div className="animate-float relative flex h-40 w-40 items-center justify-center rounded-full border border-violet-500/30 bg-gradient-to-tr from-violet-950/60 via-slate-900/40 to-sky-950/60 shadow-[0_0_80px_rgba(139,92,246,0.3)] backdrop-blur-xl sm:h-48 sm:w-48">
+            <div className="h-28 w-28 rounded-full border border-sky-400/30 bg-gradient-to-br from-violet-500/20 to-transparent blur-sm sm:h-32 sm:w-32" />
+            <span className="font-display absolute text-xl font-bold tracking-widest text-white/90 sm:text-2xl">
               GK
             </span>
           </div>
