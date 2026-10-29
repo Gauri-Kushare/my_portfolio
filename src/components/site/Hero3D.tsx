@@ -190,15 +190,17 @@ export function Hero3D() {
     let touchStartX = 0;
     let touchStartY = 0;
     const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
+      const touch = e.touches[0];
+      if (touch) {
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
       }
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        const dx = (e.touches[0].clientX - touchStartX) / window.innerWidth;
-        const dy = (e.touches[0].clientY - touchStartY) / window.innerHeight;
+      const touch = e.touches[0];
+      if (touch) {
+        const dx = (touch.clientX - touchStartX) / window.innerWidth;
+        const dy = (touch.clientY - touchStartY) / window.innerHeight;
         targetRotationY += dx * 0.05;
         targetRotationX += dy * 0.05;
       }
@@ -220,7 +222,9 @@ export function Hero3D() {
     // Intersection Observer to stop render loop when hero is scrolled past
     const io = new IntersectionObserver(
       ([entry]) => {
-        isVisible = entry.isIntersecting;
+        if (entry) {
+          isVisible = entry.isIntersecting;
+        }
       },
       { threshold: 0.05 },
     );
