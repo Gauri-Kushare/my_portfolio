@@ -10,6 +10,11 @@ import vanta3 from "../assets/Images/Website/Vanta project/vanta 3.png";
 import vanta4 from "../assets/Images/Website/Vanta project/vanta 4.png";
 import vanta5 from "../assets/Images/Website/Vanta project/vanta 5.png";
 import vanta6 from "../assets/Images/Website/Vanta project/vanta 6.png";
+
+import veloraHero from "../assets/Images/Website/Velora project/velora-hero.png";
+import veloraCollections from "../assets/Images/Website/Velora project/velora-collections.png";
+import veloraEditorial from "../assets/Images/Website/Velora project/velora-editorial.png";
+import veloraJournal from "../assets/Images/Website/Velora project/velora-journal.png";
 // GRAPHICS
 import graphic1 from "../assets/Images/Graphics/graphic-1.png";
 import graphic2 from "../assets/Images/Graphics/graphic-2.png";
@@ -102,6 +107,14 @@ export const logos = [
 ];
 
 export const websites = [
+  {
+    title: "The Velora Edit",
+    description:
+      "A wardrobe of quiet confidence. Considered silhouettes, luxurious natural fabrics and timeless pieces tailored to return to, season after season.",
+    image: veloraHero,
+    gallery: [veloraHero, veloraCollections, veloraEditorial, veloraJournal],
+    url: "https://the-velora-edit.netlify.app/",
+  },
   {
     title: "Restaurant Website",
     description: "Modern Indian restaurant website concept.",
