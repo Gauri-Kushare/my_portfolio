@@ -646,7 +646,10 @@ function Footer() {
         </div>
 
         {/* Links & Back to Top */}
-        <div className="flex items-center gap-6 text-xs text-slate-400">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+          <a href={`mailto:${profile.email}`} className="transition-colors hover:text-white">
+            {profile.email}
+          </a>
           <a
             href={profile.instagram}
             target="_blank"
