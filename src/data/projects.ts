@@ -65,7 +65,7 @@ export const profile = {
     { value: "30+", label: "Clients" },
     { value: "3", label: "Years experience" },
   ],
-  email: "gauri.pro24@gmail.com",
+  email: "gaurikushare18@gmail.com",
   whatsapp: "https://wa.me/917558468233",
   instagram: "https://www.instagram.com/_gauri_k24/",
 };
