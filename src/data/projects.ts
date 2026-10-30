@@ -54,6 +54,7 @@ import reel4Poster from "../assets/videos/AI REELS/thumbnails/reel-4-poster.jpg"
 import reel5Poster from "../assets/videos/AI REELS/thumbnails/reel-5-poster.jpg";
 import reel6Poster from "../assets/videos/AI REELS/thumbnails/reel-6-poster.jpg";
 import reel7Poster from "../assets/videos/AI REELS/thumbnails/reel-7-poster.jpg";
+
 export const profile = {
   name: "Gauri Kushare",
   role: "Creative Designer & Visual Storyteller",
@@ -130,6 +131,7 @@ export const websites = [
     url: "",
   },
 ];
+
 export const services = [
   {
     id: "reels",
@@ -138,7 +140,7 @@ export const services = [
   },
   {
     id: "graphics",
-    title: "Graphic Design",
+    title: "Graphics",
     text: "Posters, campaigns and social visuals with bite.",
   },
   {
@@ -147,13 +149,8 @@ export const services = [
     text: "Edits, color grading and cinematic storytelling.",
   },
   {
-    id: "logos",
-    title: "Logo Design",
-    text: "Timeless marks and identities that scale.",
-  },
-  {
     id: "websites",
-    title: "Website Design",
+    title: "Websites",
     text: "Fast, beautiful sites that convert visitors.",
   },
 ];

@@ -1,9 +1,14 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
+import { handleCmsAndUploadRequest } from "./server/cms-api";
 
-const errorMiddleware = createMiddleware().server(async ({ next }) => {
+const errorMiddleware = createMiddleware().server(async ({ next, request }) => {
   try {
+    const apiOrUploadResponse = await handleCmsAndUploadRequest(request);
+    if (apiOrUploadResponse) {
+      return apiOrUploadResponse;
+    }
     return await next();
   } catch (error) {
     if (error != null && typeof error === "object" && "statusCode" in error) {

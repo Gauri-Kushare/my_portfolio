@@ -16,6 +16,11 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+.env
+.env.*
+!.env.example
+/data/
+/public/uploads/
 *.zip
 components.zip
 .lovable
